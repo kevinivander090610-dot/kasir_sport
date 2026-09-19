@@ -1,1362 +1,146 @@
-/* =====================================================
-   SPORTCASH - DIGITAL CASHIER
-===================================================== */
+// ==========================
+// DATA BARANG
+// ==========================
 
+let barang = [
 
-/* ================= DATA ================= */
-
-const defaultProducts = [
     {
         id: 1,
-        name: "Bola Futsal Pro",
-        category: "Bola",
-        price: 285000,
-        stock: 18,
-        icon: "⚽"
+        nama: "Bola Basket",
+        jenis: "Bola",
+        harga: 350000,
+        stok: 10
     },
+
     {
         id: 2,
-        name: "Bola Basket Premium",
-        category: "Bola",
-        price: 350000,
-        stock: 12,
-        icon: "🏀"
+        nama: "Bola Futsal",
+        jenis: "Bola",
+        harga: 250000,
+        stok: 8
     },
+
     {
         id: 3,
-        name: "Jersey Football",
-        category: "Jersey",
-        price: 275000,
-        stock: 25,
-        icon: "👕"
-    },
-    {
-        id: 4,
-        name: "Jersey Basketball",
-        category: "Jersey",
-        price: 295000,
-        stock: 16,
-        icon: "🏀"
-    },
-    {
-        id: 5,
-        name: "Sepatu Running",
-        category: "Sepatu",
-        price: 650000,
-        stock: 8,
-        icon: "👟"
-    },
-    {
-        id: 6,
-        name: "Sepatu Futsal",
-        category: "Sepatu",
-        price: 720000,
-        stock: 6,
-        icon: "👟"
-    },
-    {
-        id: 7,
-        name: "Raket Badminton",
-        category: "Raket",
-        price: 450000,
-        stock: 10,
-        icon: "🏸"
-    },
-    {
-        id: 8,
-        name: "Sarung Tangan Kiper",
-        category: "Aksesori",
-        price: 175000,
-        stock: 14,
-        icon: "🧤"
+        nama: "Raket Badminton",
+        jenis: "Raket",
+        harga: 400000,
+        stok: 5
     }
+
 ];
 
 
-let products =
-    JSON.parse(localStorage.getItem("sportcash_products")) ||
-    defaultProducts;
+// ==========================
+// DATA KAS
+// ==========================
+
+let kas = [];
 
 
-let cashTransactions =
-    JSON.parse(localStorage.getItem("sportcash_cash")) || [];
+// ==========================
+// FORMAT RUPIAH
+// ==========================
 
+function rupiah(angka) {
 
-let sales =
-    JSON.parse(localStorage.getItem("sportcash_sales")) || [];
-
-
-let cart = [];
-
-
-/* ================= INIT ================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    updateDate();
-
-    setupNavigation();
-
-    renderDashboard();
-
-    renderStocks();
-
-    renderProducts();
-
-    renderCashTable();
-
-    renderReport();
-
-    setupCursor();
-
-    setupSearch();
-
-    setupForms();
-
-});
-
-
-/* ================= DATE ================= */
-
-function updateDate() {
-
-    const now = new Date();
-
-    const date = now.toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-
-    document.getElementById("currentDate").textContent = date;
+    return "Rp " + angka.toLocaleString("id-ID");
 
 }
 
 
-/* ================= NAVIGATION ================= */
+// ==========================
+// PINDAH HALAMAN
+// ==========================
 
-function setupNavigation() {
+function showPage(nama) {
 
-    document.querySelectorAll(".nav-link").forEach(link => {
+    let pages = document.querySelectorAll(".page");
 
-        link.addEventListener("click", e => {
+    pages.forEach(function(page) {
 
-            e.preventDefault();
-
-            const section = link.dataset.section;
-
-            showSection(section);
-
-        });
+        page.classList.remove("active");
 
     });
-
-}
-
-
-function showSection(sectionName) {
-
-    document.querySelectorAll(".content-section")
-        .forEach(section => section.classList.remove("active-section"));
-
-
-    const target = document.getElementById(sectionName);
-
-    if (target) {
-
-        target.classList.add("active-section");
-
-    }
-
-
-    document.querySelectorAll(".nav-link")
-        .forEach(link => link.classList.remove("active"));
-
-
-    const activeLink =
-        document.querySelector(`[data-section="${sectionName}"]`);
-
-    if (activeLink) {
-
-        activeLink.classList.add("active");
-
-    }
-
-
-    const titles = {
-        dashboard: "Dashboard",
-        stok: "Data Stok",
-        transaksi: "Transaksi Penjualan",
-        kas: "Kas Masuk & Keluar",
-        laporan: "Laporan Keuangan",
-        pengaturan: "Pengaturan"
-    };
-
-    document.getElementById("pageTitle").textContent =
-        titles[sectionName] || "Dashboard";
-
-}
-
-
-/* ================= FORMAT ================= */
-
-function formatRupiah(value) {
-
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        maximumFractionDigits: 0
-    }).format(value);
-
-}
-
-
-/* ================= STORAGE ================= */
-
-function saveData() {
-
-    localStorage.setItem(
-        "sportcash_products",
-        JSON.stringify(products)
-    );
-
-    localStorage.setItem(
-        "sportcash_cash",
-        JSON.stringify(cashTransactions)
-    );
-
-    localStorage.setItem(
-        "sportcash_sales",
-        JSON.stringify(sales)
-    );
-
-}
-
-
-/* ================= MONTH DATA ================= */
-
-function getCurrentMonthData() {
-
-    const now = new Date();
-
-    const month = now.getMonth();
-    const year = now.getFullYear();
-
-
-    const monthlyCash =
-        cashTransactions.filter(item => {
-
-            const date = new Date(item.date);
-
-            return (
-                date.getMonth() === month &&
-                date.getFullYear() === year
-            );
-
-        });
-
-
-    const monthlySales =
-        sales.filter(item => {
-
-            const date = new Date(item.date);
-
-            return (
-                date.getMonth() === month &&
-                date.getFullYear() === year
-            );
-
-        });
-
-
-    return {
-        cash: monthlyCash,
-        sales: monthlySales
-    };
-
-}
-
-
-/* ================= DASHBOARD ================= */
-
-function renderDashboard() {
-
-    const data = getCurrentMonthData();
-
-
-    const income =
-        data.cash
-            .filter(x => x.type === "masuk")
-            .reduce((sum, x) => sum + Number(x.amount), 0);
-
-
-    const expense =
-        data.cash
-            .filter(x => x.type === "keluar")
-            .reduce((sum, x) => sum + Number(x.amount), 0);
-
-
-    const profit = income - expense;
-
-
-    const totalStock =
-        products.reduce((sum, p) => sum + Number(p.stock), 0);
-
-
-    document.getElementById("incomeValue").textContent =
-        formatRupiah(income);
-
-
-    document.getElementById("expenseValue").textContent =
-        formatRupiah(expense);
-
-
-    document.getElementById("profitValue").textContent =
-        formatRupiah(profit);
-
-
-    document.getElementById("stockValue").textContent =
-        totalStock;
-
-
-    renderCategories();
-
-    renderRecentTransactions();
-
-    renderChart();
-
-    renderCashSummary();
-
-    renderReport();
-
-}
-
-
-/* ================= CATEGORY ================= */
-
-function renderCategories() {
-
-    const container =
-        document.getElementById("categoryList");
-
-    const categories = {};
-
-    products.forEach(product => {
-
-        if (!categories[product.category]) {
-
-            categories[product.category] = 0;
-
-        }
-
-        categories[product.category] +=
-            Number(product.stock);
-
-    });
-
-
-    const total =
-        Object.values(categories)
-            .reduce((a,b) => a+b, 0);
-
-
-    container.innerHTML = "";
-
-
-    Object.entries(categories).forEach(([name, amount]) => {
-
-        const percent =
-            total === 0
-                ? 0
-                : Math.round((amount / total) * 100);
-
-
-        const icons = {
-            Bola: "⚽",
-            Jersey: "👕",
-            Sepatu: "👟",
-            Raket: "🏸",
-            Aksesori: "🧤"
-        };
-
-
-        container.innerHTML += `
-
-            <div class="category-row">
-
-                <div class="category-icon">
-                    ${icons[name] || "📦"}
-                </div>
-
-                <div class="category-info">
-
-                    <strong>${name}</strong>
-
-                    <small>
-                        ${amount} unit
-                    </small>
-
-                </div>
-
-                <div class="category-percent">
-                    ${percent}%
-                </div>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-/* ================= CHART ================= */
-
-let cashChart;
-
-
-function renderChart() {
-
-    const canvas =
-        document.getElementById("cashChart");
-
-    if (!canvas) return;
-
-
-    const labels = [];
-
-    const incomeData = [];
-
-    const expenseData = [];
-
-
-    for (let i = 6; i >= 0; i--) {
-
-        const date = new Date();
-
-        date.setDate(date.getDate() - i);
-
-
-        const key =
-            date.toISOString().split("T")[0];
-
-
-        labels.push(
-            date.toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "short"
-            })
-        );
-
-
-        const income =
-            cashTransactions
-                .filter(x =>
-                    x.date === key &&
-                    x.type === "masuk"
-                )
-                .reduce((sum,x) =>
-                    sum + Number(x.amount),0
-                );
-
-
-        const expense =
-            cashTransactions
-                .filter(x =>
-                    x.date === key &&
-                    x.type === "keluar"
-                )
-                .reduce((sum,x) =>
-                    sum + Number(x.amount),0
-                );
-
-
-        incomeData.push(income);
-
-        expenseData.push(expense);
-
-    }
-
-
-    if (cashChart) {
-
-        cashChart.destroy();
-
-    }
-
-
-    cashChart =
-        new Chart(canvas, {
-
-            type: "line",
-
-            data: {
-
-                labels,
-
-                datasets: [
-
-                    {
-                        label: "Kas Masuk",
-                        data: incomeData,
-                        borderWidth: 2,
-                        tension: .4,
-                        fill: true
-                    },
-
-                    {
-                        label: "Kas Keluar",
-                        data: expenseData,
-                        borderWidth: 2,
-                        tension: .4,
-                        fill: true
-                    }
-
-                ]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-                        labels: {
-                            color: "#8993a6",
-                            font: {
-                                size: 10
-                            }
-                        }
-                    }
-
-                },
-
-                scales: {
-
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: "#687286",
-                            font: {
-                                size: 9
-                            }
-                        }
-                    },
-
-                    y: {
-                        grid: {
-                            color: "rgba(255,255,255,.05)"
-                        },
-                        ticks: {
-                            color: "#687286",
-                            font: {
-                                size: 9
-                            }
-                        }
-                    }
-
-                }
-
-            }
-
-        });
-
-}
-
-
-/* ================= RECENT TRANSACTIONS ================= */
-
-function renderRecentTransactions() {
-
-    const table =
-        document.getElementById("recentTransactions");
-
-    const all =
-        [...cashTransactions]
-            .sort((a,b) =>
-                new Date(b.date) - new Date(a.date)
-            )
-            .slice(0,5);
-
-
-    table.innerHTML = "";
-
-
-    if (all.length === 0) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Belum ada transaksi.
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
-
-
-    all.forEach(item => {
-
-        table.innerHTML += `
-
-            <tr>
-
-                <td>${formatDate(item.date)}</td>
-
-                <td>
-                    <span class="status ${item.type === "masuk" ? "in" : "out"}">
-                        ${item.type === "masuk" ? "Kas Masuk" : "Kas Keluar"}
-                    </span>
-                </td>
-
-                <td>${item.description}</td>
-
-                <td>
-                    ${formatRupiah(item.amount)}
-                </td>
-
-                <td>
-                    <span class="status ready">
-                        Selesai
-                    </span>
-                </td>
-
-            </tr>
-
-        `;
-
-    });
-
-}
-
-
-/* ================= STOCK ================= */
-
-function renderStocks() {
-
-    const grid =
-        document.getElementById("stockGrid");
-
-    if (!grid) return;
-
-
-    const search =
-        document.getElementById("stockSearch")?.value
-        .toLowerCase() || "";
-
-
-    const category =
-        document.getElementById("categoryFilter")?.value ||
-        "all";
-
-
-    const filtered =
-        products.filter(product => {
-
-            const matchesSearch =
-                product.name
-                    .toLowerCase()
-                    .includes(search);
-
-
-            const matchesCategory =
-                category === "all" ||
-                product.category === category;
-
-
-            return matchesSearch && matchesCategory;
-
-        });
-
-
-    grid.innerHTML = "";
-
-
-    filtered.forEach(product => {
-
-        const lowStock = product.stock <= 7;
-
-
-        grid.innerHTML += `
-
-            <div class="stock-card">
-
-                <div class="product-image">
-                    ${product.icon}
-                </div>
-
-                <span class="category">
-                    ${product.category}
-                </span>
-
-                <h3>
-                    ${product.name}
-                </h3>
-
-                <div class="stock-price">
-                    ${formatRupiah(product.price)}
-                </div>
-
-                <div class="stock-bottom">
-
-                    <span class="stock-count">
-                        Stok: ${product.stock}
-                    </span>
-
-                    <span class="status ${lowStock ? "low" : "ready"}">
-                        ${lowStock ? "Menipis" : "Tersedia"}
-                    </span>
-
-                </div>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-/* ================= SEARCH ================= */
-
-function setupSearch() {
-
-    document
-        .getElementById("stockSearch")
-        ?.addEventListener("input", renderStocks);
 
 
     document
-        .getElementById("categoryFilter")
-        ?.addEventListener("change", renderStocks);
+        .getElementById(nama)
+        .classList.add("active");
 
 
-    document
-        .getElementById("cashFilter")
-        ?.addEventListener("change", renderCashTable);
+    if (nama === "dashboard") {
 
-}
+        tampilkanDashboard();
 
-
-/* ================= PRODUCT SELECTION ================= */
-
-function renderProducts() {
-
-    const container =
-        document.getElementById("productSelection");
-
-    if (!container) return;
+    }
 
 
-    container.innerHTML = "";
+    if (nama === "stok") {
+
+        tampilkanStok();
+
+    }
 
 
-    products.forEach(product => {
+    if (nama === "kasir") {
 
-        if (product.stock <= 0) return;
+        tampilkanPilihanBarang();
 
-
-        container.innerHTML += `
-
-            <button
-                class="select-product"
-                onclick="addToCart(${product.id})"
-            >
-
-                <div class="emoji">
-                    ${product.icon}
-                </div>
-
-                <h4>
-                    ${product.name}
-                </h4>
-
-                <small>
-                    ${formatRupiah(product.price)}
-                </small>
-
-            </button>
-
-        `;
-
-    });
+    }
 
 
-    const select =
-        document.getElementById("transactionProduct");
+    if (nama === "kas") {
 
-    if (select) {
-
-        select.innerHTML = "";
-
-        products.forEach(product => {
-
-            select.innerHTML += `
-                <option value="${product.id}">
-                    ${product.name}
-                </option>
-            `;
-
-        });
+        tampilkanKas();
 
     }
 
 }
 
 
-/* ================= CART ================= */
+// ==========================
+// MENAMPILKAN DATA STOK
+// ==========================
 
-function addToCart(id) {
+function tampilkanStok() {
 
-    const product =
-        products.find(p => p.id === id);
+    let tabel =
+        document.getElementById("tabelStok");
 
+    tabel.innerHTML = "";
 
-    if (!product || product.stock <= 0) {
 
-        showToast("Stok produk habis.");
+    barang.forEach(function(item) {
 
-        return;
-
-    }
-
-
-    const existing =
-        cart.find(item => item.id === id);
-
-
-    if (existing) {
-
-        if (existing.quantity >= product.stock) {
-
-            showToast("Jumlah melebihi stok.");
-
-            return;
-
-        }
-
-        existing.quantity++;
-
-    } else {
-
-        cart.push({
-            id,
-            quantity: 1
-        });
-
-    }
-
-
-    renderCart();
-
-}
-
-
-function renderCart() {
-
-    const container =
-        document.getElementById("cartItems");
-
-
-    const count =
-        cart.reduce((sum,item) =>
-            sum + item.quantity,0
-        );
-
-
-    document.getElementById("cartCount").textContent =
-        `${count} item`;
-
-
-    if (cart.length === 0) {
-
-        container.innerHTML = `
-            <div class="empty-cart">
-                🛒
-                <p>Belum ada produk</p>
-            </div>
-        `;
-
-        document.getElementById("cartTotal").textContent =
-            "Rp 0";
-
-        return;
-
-    }
-
-
-    let total = 0;
-
-    container.innerHTML = "";
-
-
-    cart.forEach(item => {
-
-        const product =
-            products.find(p => p.id === item.id);
-
-
-        const subtotal =
-            product.price * item.quantity;
-
-
-        total += subtotal;
-
-
-        container.innerHTML += `
-
-            <div class="cart-item">
-
-                <div>
-
-                    <strong>
-                        ${product.name}
-                    </strong>
-
-                    <small>
-                        ${item.quantity} ×
-                        ${formatRupiah(product.price)}
-                    </small>
-
-                </div>
-
-                <button
-                    class="remove-cart"
-                    onclick="removeFromCart(${product.id})"
-                >
-                    ×
-                </button>
-
-            </div>
-
-        `;
-
-    });
-
-
-    document.getElementById("cartTotal").textContent =
-        formatRupiah(total);
-
-}
-
-
-function removeFromCart(id) {
-
-    cart =
-        cart.filter(item => item.id !== id);
-
-    renderCart();
-
-}
-
-
-function clearCart() {
-
-    cart = [];
-
-    renderCart();
-
-}
-
-
-/* ================= CHECKOUT ================= */
-
-function checkout() {
-
-    if (cart.length === 0) {
-
-        showToast("Keranjang masih kosong.");
-
-        return;
-
-    }
-
-
-    let total = 0;
-
-
-    cart.forEach(item => {
-
-        const product =
-            products.find(p => p.id === item.id);
-
-
-        total +=
-            product.price * item.quantity;
-
-
-        product.stock -= item.quantity;
-
-    });
-
-
-    const transaction = {
-
-        id: Date.now(),
-
-        date: getToday(),
-
-        type: "masuk",
-
-        amount: total,
-
-        description: "Penjualan produk olahraga"
-
-    };
-
-
-    cashTransactions.push(transaction);
-
-    sales.push(transaction);
-
-
-    saveData();
-
-
-    cart = [];
-
-
-    renderCart();
-
-    renderDashboard();
-
-    renderStocks();
-
-    renderProducts();
-
-    renderCashTable();
-
-
-    showToast(
-        `Penjualan ${formatRupiah(total)} berhasil.`
-    );
-
-}
-
-
-/* ================= CASH MODAL ================= */
-
-function openCashModal(type) {
-
-    document.getElementById("cashType").value =
-        type;
-
-
-    document.getElementById("cashModalTitle").textContent =
-        type === "masuk"
-            ? "Kas Masuk"
-            : "Kas Keluar";
-
-
-    document.getElementById("cashDate").value =
-        getToday();
-
-
-    document.getElementById("cashModal").classList.add("show");
-
-}
-
-
-function setupForms() {
-
-    document
-        .getElementById("cashForm")
-        .addEventListener("submit", e => {
-
-            e.preventDefault();
-
-
-            const transaction = {
-
-                id: Date.now(),
-
-                date:
-                    document.getElementById("cashDate").value,
-
-                type:
-                    document.getElementById("cashType").value,
-
-                amount:
-                    Number(
-                        document.getElementById("cashAmount").value
-                    ),
-
-                description:
-                    document.getElementById("cashDescription").value
-
-            };
-
-
-            cashTransactions.push(transaction);
-
-            saveData();
-
-            closeModal("cashModal");
-
-            e.target.reset();
-
-            renderDashboard();
-
-            renderCashTable();
-
-            showToast("Transaksi kas berhasil ditambahkan.");
-
-        });
-
-
-    document
-        .getElementById("stockForm")
-        .addEventListener("submit", e => {
-
-            e.preventDefault();
-
-
-            const product = {
-
-                id: Date.now(),
-
-                name:
-                    document.getElementById("stockName").value,
-
-                category:
-                    document.getElementById("stockCategory").value,
-
-                price:
-                    Number(
-                        document.getElementById("stockPrice").value
-                    ),
-
-                stock:
-                    Number(
-                        document.getElementById("stockQuantity").value
-                    ),
-
-                icon:
-                    getCategoryIcon(
-                        document.getElementById("stockCategory").value
-                    )
-
-            };
-
-
-            products.push(product);
-
-            saveData();
-
-            closeModal("stockModal");
-
-            e.target.reset();
-
-            renderStocks();
-
-            renderProducts();
-
-            renderDashboard();
-
-            showToast("Barang berhasil ditambahkan.");
-
-        });
-
-
-    document
-        .getElementById("transactionForm")
-        .addEventListener("submit", e => {
-
-            e.preventDefault();
-
-
-            const id =
-                Number(
-                    document.getElementById("transactionProduct").value
-                );
-
-
-            const quantity =
-                Number(
-                    document.getElementById("transactionQuantity").value
-                );
-
-
-            const product =
-                products.find(p => p.id === id);
-
-
-            if (!product || quantity > product.stock) {
-
-                showToast("Stok tidak mencukupi.");
-
-                return;
-
-            }
-
-
-            const total =
-                product.price * quantity;
-
-
-            product.stock -= quantity;
-
-
-            cashTransactions.push({
-
-                id: Date.now(),
-
-                date: getToday(),
-
-                type: "masuk",
-
-                amount: total,
-
-                description:
-                    `Penjualan ${product.name} (${quantity}x)`
-
-            });
-
-
-            sales.push({
-
-                id: Date.now(),
-
-                date: getToday(),
-
-                type: "masuk",
-
-                amount: total,
-
-                description:
-                    `Penjualan ${product.name}`
-
-            });
-
-
-            saveData();
-
-
-            closeModal("transactionModal");
-
-            e.target.reset();
-
-
-            renderDashboard();
-
-            renderStocks();
-
-            renderProducts();
-
-            renderCashTable();
-
-
-            showToast(
-                `Penjualan ${formatRupiah(total)} berhasil.`
-            );
-
-        });
-
-}
-
-
-/* ================= CASH TABLE ================= */
-
-function renderCashTable() {
-
-    const table =
-        document.getElementById("cashTable");
-
-
-    if (!table) return;
-
-
-    const filter =
-        document.getElementById("cashFilter")?.value ||
-        "all";
-
-
-    let data = [...cashTransactions];
-
-
-    if (filter !== "all") {
-
-        data =
-            data.filter(item =>
-                item.type === filter
-            );
-
-    }
-
-
-    data.sort(
-        (a,b) =>
-            new Date(b.date) -
-            new Date(a.date)
-    );
-
-
-    table.innerHTML = "";
-
-
-    if (data.length === 0) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Belum ada data kas.
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
-
-
-    data.forEach(item => {
-
-        table.innerHTML += `
+        tabel.innerHTML += `
 
             <tr>
 
                 <td>
-                    ${formatDate(item.date)}
+                    ${item.nama}
                 </td>
 
                 <td>
-
-                    <span class="status ${item.type === "masuk" ? "in" : "out"}">
-
-                        ${item.type === "masuk"
-                            ? "Kas Masuk"
-                            : "Kas Keluar"}
-
-                    </span>
-
+                    ${item.jenis}
                 </td>
 
                 <td>
-                    ${item.description}
+                    ${rupiah(item.harga)}
                 </td>
 
                 <td>
-                    ${formatRupiah(item.amount)}
+                    ${item.stok}
                 </td>
 
                 <td>
 
                     <button
-                        class="remove-cart"
-                        onclick="deleteCash(${item.id})"
-                    >
+                        class="delete"
+                        onclick="hapusBarang(${item.id})">
+
                         Hapus
+
                     </button>
 
                 </td>
@@ -1370,142 +154,417 @@ function renderCashTable() {
 }
 
 
-/* ================= DELETE CASH ================= */
+// ==========================
+// TAMBAH BARANG
+// ==========================
 
-function deleteCash(id) {
+function tambahBarang() {
 
-    if (!confirm("Hapus transaksi ini?")) return;
+    let nama =
+        document.getElementById("namaBarang").value;
 
+    let jenis =
+        document.getElementById("jenisBarang").value;
 
-    cashTransactions =
-        cashTransactions.filter(
-            item => item.id !== id
+    let harga =
+        Number(
+            document.getElementById("hargaBarang").value
+        );
+
+    let stok =
+        Number(
+            document.getElementById("stokBarang").value
         );
 
 
-    saveData();
+    if (
+        nama === "" ||
+        jenis === "" ||
+        harga <= 0 ||
+        stok < 0
+    ) {
 
-    renderDashboard();
+        alert("Lengkapi data barang!");
 
-    renderCashTable();
+        return;
 
-    showToast("Transaksi berhasil dihapus.");
-
-}
-
-
-/* ================= CASH SUMMARY ================= */
-
-function renderCashSummary() {
-
-    const income =
-        cashTransactions
-            .filter(x => x.type === "masuk")
-            .reduce(
-                (sum,x) => sum + Number(x.amount),
-                0
-            );
+    }
 
 
-    const expense =
-        cashTransactions
-            .filter(x => x.type === "keluar")
-            .reduce(
-                (sum,x) => sum + Number(x.amount),
-                0
-            );
+    barang.push({
+
+        id: Date.now(),
+
+        nama: nama,
+
+        jenis: jenis,
+
+        harga: harga,
+
+        stok: stok
+
+    });
 
 
-    document.getElementById("cashInTotal").textContent =
-        formatRupiah(income);
+    document.getElementById("namaBarang").value = "";
+
+    document.getElementById("jenisBarang").value = "";
+
+    document.getElementById("hargaBarang").value = "";
+
+    document.getElementById("stokBarang").value = "";
 
 
-    document.getElementById("cashOutTotal").textContent =
-        formatRupiah(expense);
+    tampilkanStok();
 
-
-    document.getElementById("cashBalance").textContent =
-        formatRupiah(income - expense);
+    tampilkanDashboard();
 
 }
 
 
-/* ================= REPORT ================= */
+// ==========================
+// HAPUS BARANG
+// ==========================
 
-function renderReport() {
+function hapusBarang(id) {
 
-    const income =
-        cashTransactions
-            .filter(x => x.type === "masuk")
-            .reduce(
-                (sum,x) => sum + Number(x.amount),
-                0
-            );
+    barang = barang.filter(function(item) {
 
+        return item.id !== id;
 
-    const expense =
-        cashTransactions
-            .filter(x => x.type === "keluar")
-            .reduce(
-                (sum,x) => sum + Number(x.amount),
-                0
-            );
+    });
 
 
-    document.getElementById("reportIncome").textContent =
-        formatRupiah(income);
+    tampilkanStok();
+
+    tampilkanDashboard();
+
+}
 
 
-    document.getElementById("reportExpense").textContent =
-        formatRupiah(expense);
+// ==========================
+// PILIH BARANG DI KASIR
+// ==========================
+
+function tampilkanPilihanBarang() {
+
+    let select =
+        document.getElementById("pilihBarang");
+
+    select.innerHTML = "";
 
 
-    document.getElementById("reportProfit").textContent =
-        formatRupiah(income - expense);
+    barang.forEach(function(item) {
+
+        select.innerHTML += `
+
+            <option value="${item.id}">
+
+                ${item.nama} -
+                ${rupiah(item.harga)}
+
+            </option>
+
+        `;
+
+    });
 
 
-    const table =
-        document.getElementById("reportStock");
+    tampilkanHarga();
+
+}
 
 
-    if (!table) return;
+// ==========================
+// MENAMPILKAN HARGA
+// ==========================
+
+function tampilkanHarga() {
+
+    let id =
+        Number(
+            document.getElementById("pilihBarang").value
+        );
 
 
-    table.innerHTML = "";
+    let item =
+        barang.find(function(data) {
+
+            return data.id === id;
+
+        });
 
 
-    products.forEach(product => {
+    if (item) {
 
-        const low = product.stock <= 7;
+        document.getElementById(
+            "hargaKasir"
+        ).textContent =
+            rupiah(item.harga);
+
+    }
+
+}
 
 
-        table.innerHTML += `
+// ==========================
+// HITUNG TOTAL
+// ==========================
+
+function hitungTotal() {
+
+    let id =
+        Number(
+            document.getElementById("pilihBarang").value
+        );
+
+
+    let jumlah =
+        Number(
+            document.getElementById("jumlahBeli").value
+        );
+
+
+    let item =
+        barang.find(function(data) {
+
+            return data.id === id;
+
+        });
+
+
+    if (!item || jumlah <= 0) {
+
+        alert("Masukkan jumlah barang!");
+
+        return;
+
+    }
+
+
+    if (jumlah > item.stok) {
+
+        alert("Stok tidak mencukupi!");
+
+        return;
+
+    }
+
+
+    let total =
+        item.harga * jumlah;
+
+
+    document.getElementById(
+        "totalKasir"
+    ).textContent =
+        rupiah(total);
+
+}
+
+
+// ==========================
+// SIMPAN PENJUALAN
+// ==========================
+
+function simpanPenjualan() {
+
+    let id =
+        Number(
+            document.getElementById("pilihBarang").value
+        );
+
+
+    let jumlah =
+        Number(
+            document.getElementById("jumlahBeli").value
+        );
+
+
+    let item =
+        barang.find(function(data) {
+
+            return data.id === id;
+
+        });
+
+
+    if (!item || jumlah <= 0) {
+
+        alert("Masukkan jumlah barang!");
+
+        return;
+
+    }
+
+
+    if (jumlah > item.stok) {
+
+        alert("Stok tidak mencukupi!");
+
+        return;
+
+    }
+
+
+    let total =
+        item.harga * jumlah;
+
+
+    // Kurangi stok
+
+    item.stok -= jumlah;
+
+
+    // Tambahkan kas masuk
+
+    kas.push({
+
+        tanggal: tanggalHariIni(),
+
+        jenis: "masuk",
+
+        jumlah: total,
+
+        keterangan:
+            "Penjualan " + item.nama
+
+    });
+
+
+    document.getElementById(
+        "jumlahBeli"
+    ).value = "";
+
+
+    document.getElementById(
+        "totalKasir"
+    ).textContent = "Rp 0";
+
+
+    tampilkanPilihanBarang();
+
+    tampilkanDashboard();
+
+
+    alert("Penjualan berhasil disimpan!");
+
+}
+
+
+// ==========================
+// TAMBAH KAS
+// ==========================
+
+function tambahKas() {
+
+    let tanggal =
+        document.getElementById("tanggalKas").value;
+
+
+    let jenis =
+        document.getElementById("jenisKas").value;
+
+
+    let jumlah =
+        Number(
+            document.getElementById("jumlahKas").value
+        );
+
+
+    let keterangan =
+        document.getElementById(
+            "keteranganKas"
+        ).value;
+
+
+    if (
+        tanggal === "" ||
+        jumlah <= 0 ||
+        keterangan === ""
+    ) {
+
+        alert("Lengkapi data kas!");
+
+        return;
+
+    }
+
+
+    kas.push({
+
+        tanggal: tanggal,
+
+        jenis: jenis,
+
+        jumlah: jumlah,
+
+        keterangan: keterangan
+
+    });
+
+
+    document.getElementById(
+        "jumlahKas"
+    ).value = "";
+
+
+    document.getElementById(
+        "keteranganKas"
+    ).value = "";
+
+
+    tampilkanKas();
+
+    tampilkanDashboard();
+
+}
+
+
+// ==========================
+// TAMPILKAN KAS
+// ==========================
+
+function tampilkanKas() {
+
+    let tabel =
+        document.getElementById("tabelKas");
+
+
+    tabel.innerHTML = "";
+
+
+    kas.forEach(function(item, index) {
+
+        tabel.innerHTML += `
 
             <tr>
 
                 <td>
-                    ${product.name}
+                    ${item.tanggal}
                 </td>
 
                 <td>
-                    ${product.category}
+                    ${item.jenis}
                 </td>
 
                 <td>
-                    ${formatRupiah(product.price)}
+                    ${rupiah(item.jumlah)}
                 </td>
 
                 <td>
-                    ${product.stock}
+                    ${item.keterangan}
                 </td>
 
                 <td>
 
-                    <span class="status ${low ? "low" : "ready"}">
+                    <button
+                        class="delete"
+                        onclick="hapusKas(${index})">
 
-                        ${low ? "Stok Menipis" : "Aman"}
+                        Hapus
 
-                    </span>
+                    </button>
 
                 </td>
 
@@ -1518,210 +577,191 @@ function renderReport() {
 }
 
 
-/* ================= MODALS ================= */
+// ==========================
+// HAPUS KAS
+// ==========================
 
-function openStockModal() {
+function hapusKas(index) {
 
-    document
-        .getElementById("stockModal")
-        .classList.add("show");
+    kas.splice(index, 1);
 
-}
+    tampilkanKas();
 
-
-function openTransactionModal() {
-
-    renderProducts();
-
-    document
-        .getElementById("transactionModal")
-        .classList.add("show");
+    tampilkanDashboard();
 
 }
 
 
-function closeModal(id) {
+// ==========================
+// DASHBOARD
+// ==========================
 
-    document
-        .getElementById(id)
-        .classList.remove("show");
+function tampilkanDashboard() {
+
+    let masuk = 0;
+
+    let keluar = 0;
+
+
+    kas.forEach(function(item) {
+
+        if (item.jenis === "masuk") {
+
+            masuk += item.jumlah;
+
+        } else {
+
+            keluar += item.jumlah;
+
+        }
+
+    });
+
+
+    let laba =
+        masuk - keluar;
+
+
+    document.getElementById(
+        "totalMasuk"
+    ).textContent =
+        rupiah(masuk);
+
+
+    document.getElementById(
+        "totalKeluar"
+    ).textContent =
+        rupiah(keluar);
+
+
+    document.getElementById(
+        "laba"
+    ).textContent =
+        rupiah(laba);
+
+
+    document.getElementById(
+        "jumlahBarang"
+    ).textContent =
+        barang.length;
+
+
+    tampilkanArusKas();
 
 }
 
 
-window.addEventListener("click", e => {
+// ==========================
+// ARUS KAS
+// ==========================
 
-    if (e.target.classList.contains("modal-overlay")) {
+function tampilkanArusKas() {
 
-        e.target.classList.remove("show");
+    let container =
+        document.getElementById("arusKas");
+
+
+    container.innerHTML = "";
+
+
+    let data =
+        kas.slice(-7);
+
+
+    if (data.length === 0) {
+
+        container.innerHTML =
+            "<p>Belum ada transaksi.</p>";
+
+        return;
 
     }
 
-});
 
+    let terbesar =
+        Math.max(
+            ...data.map(function(item) {
 
-/* ================= TOAST ================= */
+                return item.jumlah;
 
-let toastTimeout;
-
-
-function showToast(message) {
-
-    const toast =
-        document.getElementById("toast");
-
-
-    document.getElementById("toastMessage")
-        .textContent = message;
-
-
-    toast.classList.add("show");
-
-
-    clearTimeout(toastTimeout);
-
-
-    toastTimeout =
-        setTimeout(() => {
-
-            toast.classList.remove("show");
-
-        }, 3000);
-
-}
-
-
-/* ================= CURSOR ================= */
-
-function setupCursor() {
-
-    const dot =
-        document.querySelector(".cursor-dot");
-
-    const outline =
-        document.querySelector(".cursor-outline");
-
-
-    document.addEventListener("mousemove", e => {
-
-        dot.style.left = `${e.clientX}px`;
-
-        dot.style.top = `${e.clientY}px`;
-
-
-        outline.animate(
-            {
-                left: `${e.clientX}px`,
-                top: `${e.clientY}px`
-            },
-            {
-                duration: 350,
-                fill: "forwards"
-            }
-        );
-
-    });
-
-
-    const interactive =
-        document.querySelectorAll(
-            "button, a, input, select, .stock-card, .select-product"
+            })
         );
 
 
-    interactive.forEach(element => {
+    data.forEach(function(item) {
 
-        element.addEventListener("mouseenter", () => {
-
-            document.body.classList.add("cursor-hover");
-
-        });
+        let tinggi =
+            (item.jumlah / terbesar) * 130;
 
 
-        element.addEventListener("mouseleave", () => {
+        let warna =
+            item.jenis === "masuk"
+            ? "#2563eb"
+            : "#dc2626";
 
-            document.body.classList.remove("cursor-hover");
 
-        });
+        container.innerHTML += `
+
+            <div
+                class="bar"
+                style="
+                    height:${tinggi}px;
+                    background:${warna};
+                "
+            >
+
+                <span>
+                    ${item.jenis}
+                </span>
+
+            </div>
+
+        `;
 
     });
 
 }
 
 
-/* ================= HELPERS ================= */
+// ==========================
+// TANGGAL HARI INI
+// ==========================
 
-function getToday() {
+function tanggalHariIni() {
 
-    const now = new Date();
-
-    return now.toISOString().split("T")[0];
-
-}
-
-
-function formatDate(date) {
-
-    return new Date(date).toLocaleDateString(
-        "id-ID",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
-
-}
+    let tanggal =
+        new Date();
 
 
-function getCategoryIcon(category) {
+    let tahun =
+        tanggal.getFullYear();
 
-    const icons = {
-        Bola: "⚽",
-        Jersey: "👕",
-        Sepatu: "👟",
-        Raket: "🏸",
-        Aksesori: "🧤"
-    };
 
-    return icons[category] || "📦";
+    let bulan =
+        String(
+            tanggal.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    let hari =
+        String(
+            tanggal.getDate()
+        ).padStart(2, "0");
+
+
+    return `${tahun}-${bulan}-${hari}`;
 
 }
 
 
-/* ================= RESET ================= */
+// ==========================
+// SAAT WEBSITE DIBUKA
+// ==========================
 
-function resetData() {
-
-    if (!confirm("Reset seluruh data SportCash?")) return;
-
-
-    localStorage.removeItem("sportcash_products");
-
-    localStorage.removeItem("sportcash_cash");
-
-    localStorage.removeItem("sportcash_sales");
+document.getElementById(
+    "tanggalKas"
+).value =
+    tanggalHariIni();
 
 
-    products = [...defaultProducts];
-
-    cashTransactions = [];
-
-    sales = [];
-
-    cart = [];
-
-
-    renderDashboard();
-
-    renderStocks();
-
-    renderProducts();
-
-    renderCashTable();
-
-    renderCart();
-
-    showToast("Data berhasil direset.");
-
-}
+showPage("dashboard");

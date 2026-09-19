@@ -3,698 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SportCash — Kasir Digitall</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>SportCash - Kasir Olahraga</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Custom Cursor -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <header>
+        <h1>SportCash</h1>
+        <p>Kasir Digital Perlengkapan Olahraga</p>
+    </header>
 
-    <div class="app">
+    <nav>
+        <button onclick="showPage('dashboard')">Dashboard</button>
+        <button onclick="showPage('stok')">Data Stok</button>
+        <button onclick="showPage('kasir')">Kasir</button>
+        <button onclick="showPage('kas')">Kas Masuk & Keluar</button>
+    </nav>
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
+    <main>
 
-            <div class="brand">
-                <div class="brand-icon">⚡</div>
-                <div>
-                    <h2>Sport<span>Cash</span></h2>
-                    <small>Digital Cashier</small>
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="page active">
+
+            <h2>Dashboard</h2>
+
+            <div class="cards">
+
+                <div class="card">
+                    <p>Kas Masuk</p>
+                    <h3 id="totalMasuk">Rp 0</h3>
                 </div>
+
+                <div class="card">
+                    <p>Kas Keluar</p>
+                    <h3 id="totalKeluar">Rp 0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Laba Bulan Ini</p>
+                    <h3 id="laba">Rp 0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Jenis Barang</p>
+                    <h3 id="jumlahBarang">0</h3>
+                </div>
+
             </div>
 
-            <nav>
-                <p class="menu-title">MENU UTAMA</p>
+            <div class="box">
 
-                <a href="#dashboard" class="nav-link active" data-section="dashboard">
-                    <span>▦</span> Dashboard
-                </a>
+                <h3>Arus Kas Harian</h3>
 
-                <a href="#stok" class="nav-link" data-section="stok">
-                    <span>📦</span> Data Stok
-                </a>
+                <div id="arusKas"></div>
 
-                <a href="#transaksi" class="nav-link" data-section="transaksi">
-                    <span>💳</span> Transaksi
-                </a>
-
-                <a href="#kas" class="nav-link" data-section="kas">
-                    <span>💰</span> Kas Masuk & Keluar
-                </a>
-
-                <a href="#laporan" class="nav-link" data-section="laporan">
-                    <span>📊</span> Laporan
-                </a>
-
-                <p class="menu-title">LAINNYA</p>
-
-                <a href="#pengaturan" class="nav-link" data-section="pengaturan">
-                    <span>⚙</span> Pengaturan
-                </a>
-            </nav>
-
-            <div class="sidebar-bottom">
-                <div class="profile">
-                    <div class="avatar">SC</div>
-                    <div>
-                        <strong>Admin SportCash</strong>
-                        <small>Administrator</small>
-                    </div>
-                </div>
             </div>
 
-        </aside>
+        </section>
 
-        <!-- MAIN -->
-        <main class="main">
 
-            <!-- TOPBAR -->
-            <header class="topbar">
+        <!-- DATA STOK -->
+        <section id="stok" class="page">
 
-                <div>
-                    <p class="welcome">Selamat datang kembali 👋</p>
-                    <h1 id="pageTitle">Dashboard</h1>
-                </div>
+            <h2>Data Stok</h2>
 
-                <div class="top-actions">
+            <div class="box form-box">
 
-                    <div class="date-box">
-                        📅 <span id="currentDate"></span>
-                    </div>
+                <input
+                    type="text"
+                    id="namaBarang"
+                    placeholder="Nama barang"
+                >
 
-                    <button class="icon-button" id="notificationBtn">
-                        🔔
-                        <span class="notification-dot"></span>
-                    </button>
+                <input
+                    type="text"
+                    id="jenisBarang"
+                    placeholder="Jenis barang"
+                >
 
-                    <button class="admin-button">
-                        <div class="avatar small">SC</div>
-                        <span>Admin</span>
-                        <span>⌄</span>
-                    </button>
+                <input
+                    type="number"
+                    id="hargaBarang"
+                    placeholder="Harga"
+                >
 
-                </div>
+                <input
+                    type="number"
+                    id="stokBarang"
+                    placeholder="Jumlah stok"
+                >
 
-            </header>
+                <button onclick="tambahBarang()">
+                    Tambah Barang
+                </button>
 
-
-            <!-- DASHBOARD -->
-            <section id="dashboard" class="content-section active-section">
-
-                <div class="hero-card">
-
-                    <div>
-                        <span class="hero-label">PERFORMA BULAN INI</span>
-                        <h2>Kelola bisnis olahraga<br>lebih mudah & cepat.</h2>
-                        <p>Monitor stok, transaksi, arus kas, dan keuntungan dalam satu dashboard.</p>
-
-                        <button class="primary-button" onclick="openTransactionModal()">
-                            + Tambah Transaksi
-                        </button>
-                    </div>
-
-                    <div class="hero-decoration">
-                        ⚽
-                    </div>
-
-                </div>
-
-
-                <!-- STAT CARDS -->
-                <div class="stats-grid">
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>Pemasukan</span>
-                            <div class="stat-icon green">↗</div>
-                        </div>
-
-                        <h2 id="incomeValue">Rp 0</h2>
-                        <small class="positive">Bulan ini</small>
-                    </div>
-
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>Pengeluaran</span>
-                            <div class="stat-icon red">↘</div>
-                        </div>
-
-                        <h2 id="expenseValue">Rp 0</h2>
-                        <small class="negative">Bulan ini</small>
-                    </div>
-
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>Laba Bersih</span>
-                            <div class="stat-icon purple">◆</div>
-                        </div>
-
-                        <h2 id="profitValue">Rp 0</h2>
-                        <small class="positive">Bulan ini</small>
-                    </div>
-
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>Total Stok</span>
-                            <div class="stat-icon orange">▣</div>
-                        </div>
-
-                        <h2 id="stockValue">0</h2>
-                        <small>Unit tersedia</small>
-                    </div>
-
-                </div>
-
-
-                <div class="dashboard-grid">
-
-                    <!-- CASH FLOW -->
-                    <div class="panel chart-panel">
-
-                        <div class="panel-header">
-                            <div>
-                                <h3>Arus Kas Harian</h3>
-                                <p>Pergerakan pemasukan dan pengeluaran</p>
-                            </div>
-
-                            <select id="chartPeriod">
-                                <option>7 Hari</option>
-                                <option>14 Hari</option>
-                                <option>30 Hari</option>
-                            </select>
-                        </div>
-
-                        <div class="chart-container">
-                            <canvas id="cashChart"></canvas>
-                        </div>
-
-                    </div>
-
-
-                    <!-- CATEGORY -->
-                    <div class="panel">
-
-                        <div class="panel-header">
-                            <div>
-                                <h3>Jenis Barang</h3>
-                                <p>Distribusi stok produk</p>
-                            </div>
-                        </div>
-
-                        <div id="categoryList" class="category-list"></div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- RECENT TRANSACTION -->
-                <div class="panel">
-
-                    <div class="panel-header">
-
-                        <div>
-                            <h3>Transaksi Terbaru</h3>
-                            <p>Aktivitas kas terbaru</p>
-                        </div>
-
-                        <button class="text-button" onclick="showSection('kas')">
-                            Lihat Semua →
-                        </button>
-
-                    </div>
-
-                    <div class="table-wrapper">
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Jenis</th>
-                                    <th>Keterangan</th>
-                                    <th>Jumlah</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="recentTransactions"></tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- STOK -->
-            <section id="stok" class="content-section">
-
-                <div class="section-heading">
-                    <div>
-                        <h2>Data Stok</h2>
-                        <p>Kelola seluruh perlengkapan olahraga.</p>
-                    </div>
-
-                    <button class="primary-button" onclick="openStockModal()">
-                        + Tambah Barang
-                    </button>
-                </div>
-
-
-                <div class="toolbar">
-
-                    <div class="search-box">
-                        🔍
-                        <input type="text" id="stockSearch" placeholder="Cari nama barang...">
-                    </div>
-
-                    <select id="categoryFilter">
-                        <option value="all">Semua Kategori</option>
-                        <option value="Bola">Bola</option>
-                        <option value="Jersey">Jersey</option>
-                        <option value="Sepatu">Sepatu</option>
-                        <option value="Raket">Raket</option>
-                        <option value="Aksesori">Aksesori</option>
-                    </select>
-
-                </div>
-
-
-                <div class="stock-grid" id="stockGrid"></div>
-
-            </section>
-
-
-            <!-- TRANSAKSI -->
-            <section id="transaksi" class="content-section">
-
-                <div class="section-heading">
-                    <div>
-                        <h2>Transaksi Penjualan</h2>
-                        <p>Catat transaksi penjualan produk.</p>
-                    </div>
-
-                    <button class="primary-button" onclick="openTransactionModal()">
-                        + Penjualan Baru
-                    </button>
-                </div>
-
-                <div class="sale-layout">
-
-                    <div class="panel product-panel">
-
-                        <div class="panel-header">
-                            <h3>Pilih Produk</h3>
-                            <span id="cartCount">0 item</span>
-                        </div>
-
-                        <div id="productSelection" class="product-selection"></div>
-
-                    </div>
-
-
-                    <div class="panel cart-panel">
-
-                        <div class="panel-header">
-                            <h3>Keranjang</h3>
-                            <button class="clear-button" onclick="clearCart()">Kosongkan</button>
-                        </div>
-
-                        <div id="cartItems" class="cart-items">
-                            <div class="empty-cart">
-                                🛒
-                                <p>Belum ada produk</p>
-                            </div>
-                        </div>
-
-                        <div class="cart-total">
-                            <span>Total</span>
-                            <strong id="cartTotal">Rp 0</strong>
-                        </div>
-
-                        <button class="checkout-button" onclick="checkout()">
-                            Bayar Sekarang →
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- KAS -->
-            <section id="kas" class="content-section">
-
-                <div class="section-heading">
-
-                    <div>
-                        <h2>Kas Masuk & Keluar</h2>
-                        <p>Catat dan pantau semua arus kas.</p>
-                    </div>
-
-                    <div class="button-group">
-                        <button class="secondary-button" onclick="openCashModal('masuk')">
-                            + Kas Masuk
-                        </button>
-
-                        <button class="primary-button danger-button" onclick="openCashModal('keluar')">
-                            + Kas Keluar
-                        </button>
-                    </div>
-
-                </div>
-
-
-                <div class="cash-summary">
-
-                    <div class="cash-box">
-                        <span>Kas Masuk</span>
-                        <strong id="cashInTotal">Rp 0</strong>
-                    </div>
-
-                    <div class="cash-box">
-                        <span>Kas Keluar</span>
-                        <strong id="cashOutTotal">Rp 0</strong>
-                    </div>
-
-                    <div class="cash-box">
-                        <span>Saldo Kas</span>
-                        <strong id="cashBalance">Rp 0</strong>
-                    </div>
-
-                </div>
-
-
-                <div class="panel">
-
-                    <div class="panel-header">
-
-                        <div>
-                            <h3>Riwayat Kas</h3>
-                            <p>Semua transaksi masuk dan keluar.</p>
-                        </div>
-
-                        <select id="cashFilter">
-                            <option value="all">Semua</option>
-                            <option value="masuk">Kas Masuk</option>
-                            <option value="keluar">Kas Keluar</option>
-                        </select>
-
-                    </div>
-
-                    <div class="table-wrapper">
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Jenis</th>
-                                    <th>Keterangan</th>
-                                    <th>Jumlah</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="cashTable"></tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- LAPORAN -->
-            <section id="laporan" class="content-section">
-
-                <div class="section-heading">
-                    <div>
-                        <h2>Laporan Keuangan</h2>
-                        <p>Ringkasan performa keuangan toko.</p>
-                    </div>
-
-                    <button class="secondary-button" onclick="window.print()">
-                        🖨 Cetak Laporan
-                    </button>
-                </div>
-
-
-                <div class="report-cards">
-
-                    <div class="report-card">
-                        <span>Total Penjualan</span>
-                        <strong id="reportIncome">Rp 0</strong>
-                    </div>
-
-                    <div class="report-card">
-                        <span>Total Pengeluaran</span>
-                        <strong id="reportExpense">Rp 0</strong>
-                    </div>
-
-                    <div class="report-card">
-                        <span>Laba Bersih</span>
-                        <strong id="reportProfit">Rp 0</strong>
-                    </div>
-
-                </div>
-
-
-                <div class="panel">
-
-                    <div class="panel-header">
-                        <div>
-                            <h3>Ringkasan Barang</h3>
-                            <p>Informasi stok seluruh produk.</p>
-                        </div>
-                    </div>
-
-                    <div class="table-wrapper">
-
-                        <table>
-
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Kategori</th>
-                                    <th>Harga</th>
-                                    <th>Stok</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="reportStock"></tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- PENGATURAN -->
-            <section id="pengaturan" class="content-section">
-
-                <div class="section-heading">
-                    <div>
-                        <h2>Pengaturan</h2>
-                        <p>Atur preferensi aplikasi kasir.</p>
-                    </div>
-                </div>
-
-                <div class="panel settings-panel">
-
-                    <div class="setting-row">
-                        <div>
-                            <strong>Mode Tampilan</strong>
-                            <p>Gunakan tampilan gelap SportCash.</p>
-                        </div>
-
-                        <div class="toggle active">
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div>
-                            <strong>Notifikasi Stok</strong>
-                            <p>Berikan peringatan ketika stok menipis.</p>
-                        </div>
-
-                        <div class="toggle active">
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div>
-                            <strong>Data Demo</strong>
-                            <p>Reset semua data ke data awal.</p>
-                        </div>
-
-                        <button class="secondary-button" onclick="resetData()">
-                            Reset Data
-                        </button>
-                    </div>
-
-                </div>
-
-            </section>
-
-        </main>
-
-    </div>
-
-
-    <!-- STOCK MODAL -->
-    <div class="modal-overlay" id="stockModal">
-
-        <div class="modal">
-
-            <div class="modal-header">
-                <div>
-                    <h2>Tambah Barang</h2>
-                    <p>Masukkan data produk baru.</p>
-                </div>
-
-                <button class="close-button" onclick="closeModal('stockModal')">×</button>
             </div>
 
-            <form id="stockForm">
 
-                <label>Nama Barang</label>
-                <input type="text" id="stockName" placeholder="Contoh: Bola Futsal" required>
+            <div class="box table-box">
 
-                <label>Kategori</label>
-                <select id="stockCategory" required>
-                    <option value="Bola">Bola</option>
-                    <option value="Jersey">Jersey</option>
-                    <option value="Sepatu">Sepatu</option>
-                    <option value="Raket">Raket</option>
-                    <option value="Aksesori">Aksesori</option>
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Barang</th>
+                            <th>Jenis</th>
+                            <th>Harga</th>
+                            <th>Stok</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabelStok"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- KASIR -->
+        <section id="kasir" class="page">
+
+            <h2>Kasir</h2>
+
+            <div class="box">
+
+                <select
+                    id="pilihBarang"
+                    onchange="tampilkanHarga()">
                 </select>
 
-                <label>Harga</label>
-                <input type="number" id="stockPrice" placeholder="150000" required>
+                <input
+                    type="number"
+                    id="jumlahBeli"
+                    placeholder="Jumlah beli"
+                    min="1"
+                >
 
-                <label>Jumlah Stok</label>
-                <input type="number" id="stockQuantity" placeholder="10" required>
+                <p>
+                    Harga:
+                    <strong id="hargaKasir">
+                        Rp 0
+                    </strong>
+                </p>
 
-                <button class="primary-button full-button" type="submit">
-                    Simpan Barang
+                <p>
+                    Total:
+                    <strong id="totalKasir">
+                        Rp 0
+                    </strong> 
+
+                <button onclick="hitungTotal()">
+                    Hitung Total
                 </button>
 
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- CASH MODAL -->
-    <div class="modal-overlay" id="cashModal">
-
-        <div class="modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <h2 id="cashModalTitle">Kas Masuk</h2>
-                    <p>Tambahkan catatan arus kas.</p>
-                </div>
-
-                <button class="close-button" onclick="closeModal('cashModal')">×</button>
-
-            </div>
-
-            <form id="cashForm">
-
-                <input type="hidden" id="cashType">
-
-                <label>Tanggal</label>
-                <input type="date" id="cashDate" required>
-
-                <label>Jumlah</label>
-                <input type="number" id="cashAmount" placeholder="500000" required>
-
-                <label>Keterangan</label>
-                <textarea id="cashDescription" placeholder="Contoh: Pembelian stok bola..." required></textarea>
-
-                <button class="primary-button full-button" type="submit">
-                    Simpan Transaksi
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- TRANSACTION MODAL -->
-    <div class="modal-overlay" id="transactionModal">
-
-        <div class="modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <h2>Transaksi Baru</h2>
-                    <p>Catat pemasukan penjualan.</p>
-                </div>
-
-                <button class="close-button" onclick="closeModal('transactionModal')">×</button>
-
-            </div>
-
-            <form id="transactionForm">
-
-                <label>Produk</label>
-
-                <select id="transactionProduct" required></select>
-
-                <label>Jumlah</label>
-
-                <input type="number" id="transactionQuantity" min="1" value="1" required>
-
-                <button class="primary-button full-button" type="submit">
+                <button onclick="simpanPenjualan()">
                     Simpan Penjualan
                 </button>
 
-            </form>
+            </div>
 
-        </div>
- 
-
-
-    <!-- TOAST -->
-    <div class="toast" id="toast">
-        <span>✓</span>
-        <div>
-            <strong>Berhasil!</strong>
-            <p id="toastMessage">Data berhasil disimpan.</p>
-        </div>
-    </div>
+        </section>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- KAS MASUK & KELUAR -->
+        <section id="kas" class="page">
+
+            <h2>Kas Masuk & Keluar</h2>
+
+            <div class="box form-box">
+
+                <input
+                    type="date"
+                    id="tanggalKas"
+                >
+
+                <select id="jenisKas">
+
+                    <option value="masuk">
+                        Kas Masuk
+                    </option>
+
+                    <option value="keluar">
+                        Kas Keluar
+                    </option>
+
+                </select>
+
+                <input
+                    type="number"
+                    id="jumlahKas"
+                    placeholder="Jumlah"
+                >
+
+                <input
+                    type="text"
+                    id="keteranganKas"
+                    placeholder="Keterangan"
+                >
+
+                <button onclick="tambahKas()">
+                    Simpan Kas
+                </button>
+
+            </div>
+
+
+            <div class="box table-box">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Jumlah</th>
+                            <th>Keterangan</th>
+                            <th>Aksi</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tabelKas"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
     <script src="script.js"></script>
 
 </body>
